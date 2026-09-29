@@ -1,0 +1,24 @@
+{
+  "name": "jamie-humm/kirby-super-structure",
+  "description": "Kirby Super Structure: a structure field with per-field translate: false support and stable row UUIDs for multi-language sites.",
+  "type": "kirby-plugin",
+  "keywords": ["kirby", "kirby-cms", "kirby-plugin", "structure", "multilang", "translate"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jamie Humm"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "getkirby/composer-installer": "^1.2"
+  },
+  "config": {
+    "allow-plugins": {
+      "getkirby/composer-installer": true
+    }
+  },
+  "extra": {
+    "installer-name": "kirby-super-structure"
+  }
+}

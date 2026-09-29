@@ -1,0 +1,107 @@
+/**
+ * Super Structure
+ *
+ * 1. Restyles the structure table so rows look like the list items of the
+ *    pages field (separate rounded rows, no header, no cell borders).
+ * 2. In non-default languages, hides everything that would add, remove,
+ *    duplicate or reorder rows. The default language is the source of truth
+ *    for the row set, so those actions are discarded on save anyway.
+ *
+ * Everything is scoped to `.k-field-type-superstructure`, so the core
+ * structure field is not affected.
+ */
+
+/* ------------------------------------------------------------------ */
+/* 1. Pages-field look                                                */
+/* ------------------------------------------------------------------ */
+
+.k-field-type-superstructure {
+	--table-row-height: var(--field-input-height, var(--input-height));
+	--table-color-back: var(--item-color-back);
+}
+
+/* the table itself no longer draws the surface, the rows do */
+.k-field-type-superstructure .k-table {
+	background: transparent;
+	box-shadow: none;
+	border-radius: 0;
+}
+
+/* separate rows with a 2px gap, like `.k-items[data-layout="list"]` */
+.k-field-type-superstructure .k-table table {
+	border-collapse: separate;
+	border-spacing: 0 2px;
+	margin-block: -2px;
+}
+
+/* no column header, the pages field has none either */
+.k-field-type-superstructure .k-table thead {
+	display: none;
+}
+
+/* every row is a card */
+.k-field-type-superstructure .k-table tbody tr {
+	border-radius: var(--rounded);
+	box-shadow: var(--item-shadow, var(--shadow-sm));
+}
+.k-field-type-superstructure .k-table table tbody tr > td {
+	border: 0;
+	background: var(--item-color-back);
+}
+.k-field-type-superstructure .k-table table tbody tr:hover > td {
+	background: var(--table-color-hover);
+}
+.k-field-type-superstructure .k-table tbody tr > td:first-child {
+	border-start-start-radius: var(--rounded);
+	border-end-start-radius: var(--rounded);
+}
+.k-field-type-superstructure .k-table tbody tr > td:last-child {
+	border-start-end-radius: var(--rounded);
+	border-end-end-radius: var(--rounded);
+}
+
+/* the empty row keeps a card look too */
+.k-field-type-superstructure .k-table td.k-table-empty {
+	padding-block: var(--spacing-2);
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Non-default languages                                           */
+/* ------------------------------------------------------------------ */
+
+/*
+ * `data-language` only exists on multi-language installs, and
+ * `data-language-default` is only "true" for the default language
+ * (Vue drops the attribute when it is false), so test both.
+ */
+.k-panel[data-language]:not([data-language-default="true"])
+	.k-field-type-superstructure {
+	/* header: add, batch editing, "delete all" */
+	& .k-field-header .k-button-group {
+		display: none;
+	}
+
+	/* footer add button */
+	& .k-table + footer {
+		display: none;
+	}
+
+	/* empty state is clickable and would add a row */
+	& .k-empty {
+		pointer-events: none;
+		cursor: default;
+	}
+
+	/* row options: duplicate + delete */
+	& .k-table-options-column {
+		display: none;
+	}
+
+	/* sorting: no drag handle, keep the row number visible on hover */
+	& .k-table-sort-handle {
+		display: none !important;
+	}
+	& .k-table tr[data-sortable="true"]:hover .k-table-index-column .k-table-index {
+		display: block;
+	}
+}
