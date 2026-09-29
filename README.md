@@ -50,13 +50,48 @@ fields:
 - Changes to the default language are pushed to existing translations
   (`latest` and `changes` versions) via `*.update:after` hooks.
 
+## Referencing entries by UUID
+
+Every row has a stable `_uuid` that is identical in all languages, so it can be
+stored as a reference from other fields.
+
+**Blueprint:** a select field listing the rows and saving their UUID:
+
+```yaml
+client:
+  type: select
+  translate: false
+  options: query
+  query:
+    fetch: site.clients.toStructure
+    text: "{{ structureItem.company }}"
+    value: "{{ structureItem._uuid }}"
+```
+
+**Template:** find the row by its UUID:
+
+```php
+<?php
+$clientPool = $site->content()->clients()->toStructure();
+if ($client = $clientPool->findBy('_uuid', $page->client()->value())):
+    if ($image = $client->logo()->toFile()): ?>
+        <img src="<?= $image->resize(400)->url() ?>" alt="<?= $client->company() ?> Logo">
+    <?php endif ?>
+<?php endif ?>
+```
+
+Note that the key is `_uuid`, with a leading underscore.
+
+
 ## Panel behavior
 
 - Rows are styled like the pages field's list items (no table header,
-  separate rounded rows). Everything is scoped to `.k-field-type-superstructure`.
+  separate rounded rows). Everything is scoped to `.k-field-type-superstructure`. Because of this, it's better to limit `columns` to one or two entries.
 - In non-default languages the Panel hides add, batch edit, delete all,
   duplicate, delete and sorting controls (`index.css`). This is cosmetic;
   the server discards structural changes anyway.
+
+
 
 ## Limitations
 
