@@ -14,7 +14,7 @@ its **nested fields** and gives every row a stable `_uuid`.
 ## Installation
 
 ```
-composer require jamie-humm/kirby-super-structure
+composer require jamie-humm/kirby-super-structure:^1.0@beta
 ```
 
 Or copy this folder to `site/plugins/kirby-super-structure`.
