@@ -33,7 +33,7 @@ final class SuperStructure
 
         foreach ($fields as $name => $field) {
             if (($field['translate'] ?? true) === false) {
-                $names[] = $name;
+                $names[] = strtolower($name);
             }
         }
 
