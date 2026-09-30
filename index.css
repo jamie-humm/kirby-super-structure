@@ -105,3 +105,10 @@
 		display: block;
 	}
 }
+
+/* Hide the delete (trash) button in the row drawer in non-default languages */
+.k-panel[data-language]:not([data-language-default="true"])
+	.k-drawer[data-size="superstructure"]
+	.k-drawer-option:has(.k-icon[data-type="trash"]) {
+	display: none;
+}
