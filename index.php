@@ -268,6 +268,14 @@ App::plugin('jamie-humm/kirby-super-structure', [
                     $this->attrs['fields'] ?? []
                 );
             },
+            'props' => [
+                /**
+                 * Visual style of the rows: 'pages' (default) or 'structure' (core look)
+                 */
+                'appearance' => function (string $appearance = 'pages') {
+                    return $appearance === 'structure' ? 'structure' : 'pages';
+                },
+            ],
         ],
     ],
     'hooks' => [

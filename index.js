@@ -6,6 +6,20 @@ panel.plugin("jamie-humm/kirby-super-structure", {
     // (rendered as k-superstructure-field, behaves like the core structure field)
     superstructure: {
       extends: "k-structure-field",
+      props: {
+        appearance: {
+          type: String,
+          default: "pages",
+        },
+      },
+      watch: {
+        appearance() {
+          this.applyAppearance();
+        },
+      },
+      mounted() {
+        this.applyAppearance();
+      },
       methods: {
         open(...args) {
           const drawer = this.$panel.drawer;
@@ -24,6 +38,11 @@ panel.plugin("jamie-humm/kirby-super-structure", {
           } finally {
             drawer.open = original;
           }
+        },
+          applyAppearance() {
+          // the component's root element is the k-field wrapper that also
+          // carries .k-field-type-superstructure
+          this.$el.dataset.appearance = this.appearance;
         },
       },
     },

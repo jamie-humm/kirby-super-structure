@@ -30,6 +30,7 @@ Requires Kirby 5 and PHP 8.2+.
 fields:
   items:
     type: superstructure
+    appearance: structure   # 'pages' (default) or 'structure'
     fields:
       title:
         type: text
@@ -86,7 +87,7 @@ Note that the key is `_uuid`, with a leading underscore.
 ## Panel behavior
 
 - Rows are styled like the pages field's list items (no table header,
-  separate rounded rows). Everything is scoped to `.k-field-type-superstructure`. Because of this, it's better to limit `columns` to one or two entries.
+  separate rounded rows). Everything is scoped to `.k-field-type-superstructure`. Because of this, it's better to limit `columns` to one or two entries. You can set `appearance: structure` to get the core look.
 - In non-default languages the Panel hides add, batch edit, delete all,
   duplicate, delete and sorting controls (`index.css`). This is cosmetic;
   the server discards structural changes anyway.

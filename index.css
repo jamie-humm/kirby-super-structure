@@ -15,54 +15,54 @@
 /* 1. Pages-field look                                                */
 /* ------------------------------------------------------------------ */
 
-.k-field-type-superstructure {
+.k-field-type-superstructure[data-appearance="pages"] {
 	--table-row-height: var(--field-input-height, var(--input-height));
 	--table-color-back: var(--item-color-back);
-}
 
-/* the table itself no longer draws the surface, the rows do */
-.k-field-type-superstructure .k-table {
-	background: transparent;
-	box-shadow: none;
-	border-radius: 0;
-}
+	/* the table itself no longer draws the surface, the rows do */
+	& .k-table {
+		background: transparent;
+		box-shadow: none;
+		border-radius: 0;
+	}
 
-/* separate rows with a 2px gap, like `.k-items[data-layout="list"]` */
-.k-field-type-superstructure .k-table table {
-	border-collapse: separate;
-	border-spacing: 0 2px;
-	margin-block: -2px;
-}
+	/* separate rows with a 2px gap, like `.k-items[data-layout="list"]` */
+	& .k-table table {
+		border-collapse: separate;
+		border-spacing: 0 2px;
+		margin-block: -2px;
+	}
 
-/* no column header, the pages field has none either */
-.k-field-type-superstructure .k-table thead {
-	display: none;
-}
+	/* no column header, the pages field has none either */
+	& .k-table thead {
+		display: none;
+	}
 
-/* every row is a card */
-.k-field-type-superstructure .k-table tbody tr {
-	border-radius: var(--rounded);
-	box-shadow: var(--item-shadow, var(--shadow-sm));
-}
-.k-field-type-superstructure .k-table table tbody tr > td {
-	border: 0;
-	background: var(--item-color-back);
-}
-.k-field-type-superstructure .k-table table tbody tr:hover > td {
-	background: var(--table-color-hover);
-}
-.k-field-type-superstructure .k-table tbody tr > td:first-child {
-	border-start-start-radius: var(--rounded);
-	border-end-start-radius: var(--rounded);
-}
-.k-field-type-superstructure .k-table tbody tr > td:last-child {
-	border-start-end-radius: var(--rounded);
-	border-end-end-radius: var(--rounded);
-}
+	/* every row is a card */
+	& .k-table tbody tr {
+		border-radius: var(--rounded);
+		box-shadow: var(--item-shadow, var(--shadow-sm));
+	}
+	& .k-table table tbody tr > td {
+		border: 0;
+		background: var(--item-color-back);
+	}
+	& .k-table table tbody tr:hover > td {
+		background: var(--table-color-hover);
+	}
+	& .k-table tbody tr > td:first-child {
+		border-start-start-radius: var(--rounded);
+		border-end-start-radius: var(--rounded);
+	}
+	& .k-table tbody tr > td:last-child {
+		border-start-end-radius: var(--rounded);
+		border-end-end-radius: var(--rounded);
+	}
 
-/* the empty row keeps a card look too */
-.k-field-type-superstructure .k-table td.k-table-empty {
-	padding-block: var(--spacing-2);
+	/* the empty row keeps a card look too */
+	& .k-table td.k-table-empty {
+		padding-block: var(--spacing-2);
+	}
 }
 
 /* ------------------------------------------------------------------ */
