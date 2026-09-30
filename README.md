@@ -100,4 +100,4 @@ Note that the key is `_uuid`, with a leading underscore.
 
 ## License
 
-MIT © Jamie Humm
+MIT © Jamie Hunter
