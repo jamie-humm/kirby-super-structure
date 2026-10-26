@@ -73,9 +73,11 @@
  * `data-language` only exists on multi-language installs, and
  * `data-language-default` is only "true" for the default language
  * (Vue drops the attribute when it is false), so test both.
+ * `data-synced` is "false" for fields nested in blocks, layouts etc.,
+ * which behave like a core structure field.
  */
 .k-panel[data-language]:not([data-language-default="true"])
-	.k-field-type-superstructure {
+	.k-field-type-superstructure[data-synced="true"] {
 	/* header: add, batch editing, "delete all" */
 	& .k-field-header .k-button-group {
 		display: none;

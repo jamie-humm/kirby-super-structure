@@ -4,7 +4,9 @@ namespace JamieHumm\SuperStructure;
 
 use Kirby\Cms\App;
 use Kirby\Cms\ModelWithContent;
+use Kirby\Content\LockedContentException;
 use Kirby\Data\Data;
+use Kirby\Form\Field;
 use Kirby\Form\Form;
 
 /**
@@ -41,24 +43,34 @@ final class SuperStructure
     }
 
     /**
-     * Strips `translate` so Kirby's form doesn't handle it natively,
-     * and locks synced fields outside the default language.
+     * Whether rows of this field are synced across languages.
+     * Only top-level blueprint fields are; a superstructure nested in
+     * blocks, layouts or another structure behaves like a core structure.
+     */
+    public static function isSynced(Field $field): bool
+    {
+        if (App::instance()->multilang() === false) {
+            return false;
+        }
+
+        $blueprint = array_change_key_case($field->model()->blueprint()->fields());
+
+        if (($blueprint[$field->name()]['type'] ?? null) !== 'superstructure') {
+            return false;
+        }
+
+        // a nested field may share its name with a top-level one, so also
+        // make sure it belongs to the model's own form and not e.g. a block's
+        return $field->siblings()->keys() === array_keys($blueprint);
+    }
+
+    /**
+     * Strips `translate` so Kirby's form doesn't handle it natively
      */
     public static function normalizeFields(array $fields): array
     {
-        $kirby = App::instance();
-        $lock  = $kirby->multilang() && $kirby->language()->isDefault() === false;
-
         foreach ($fields as $name => $field) {
-            if (($field['translate'] ?? true) === false) {
-                unset($field['translate']);
-
-                if ($lock) {
-                    $field['disabled'] = true;
-                }
-            }
-
-            $fields[$name] = $field;
+            unset($fields[$name]['translate']);
         }
 
         return $fields;
@@ -134,26 +146,26 @@ final class SuperStructure
     /**
      * Used by the field's save(): only touches secondary languages
      */
-    public static function align(array $rows, ModelWithContent $model, string $name, array $fields): array
+    public static function align(array $rows, Field $field, array $fields): array
     {
-        $kirby  = App::instance();
-        $synced = static::syncedNames($fields);
+        // the language that is being saved, which is not necessarily
+        // the current one (e.g. `$page->update($data, 'en')`)
+        $language = $field->siblings()->language();
 
         if (
-            $synced === [] ||
-            $kirby->multilang() === false ||
-            $kirby->language()->isDefault()
+            $language->isDefault() ||
+            static::isSynced($field) === false
         ) {
             return $rows;
         }
 
-        $source = static::sourceRows($model, $name);
+        $source = static::sourceRows($field->model(), $field->name());
 
         if ($source === null) {
             return $rows;
         }
 
-        return static::apply($rows, $source, $synced);
+        return static::apply($rows, $source, static::syncedNames($fields));
     }
 
     /**
@@ -173,11 +185,6 @@ final class SuperStructure
             }
 
             $synced = static::syncedNames($props['fields'] ?? []);
-
-            if ($synced === []) {
-                continue;
-            }
-
             $source = static::sourceRows($model, $name);
 
             if ($source === null) {
@@ -209,10 +216,15 @@ final class SuperStructure
 
                     // Version::update() doesn't trigger model hooks,
                     // so this can't loop
-                    $version->update(
-                        [$name => Data::encode($aligned, 'yaml')],
-                        $code
-                    );
+                    try {
+                        $version->update(
+                            [$name => Data::encode($aligned, 'yaml')],
+                            $code
+                        );
+                    } catch (LockedContentException) {
+                        // someone else is editing this translation; it is
+                        // aligned by save() once their changes are published
+                    }
                 }
             }
         }
@@ -261,12 +273,26 @@ App::plugin('jamie-humm/kirby-super-structure', [
                     $rows[] = $row;
                 }
 
-                return SuperStructure::align(
-                    $rows,
-                    $this->model(),
-                    $this->name(),
-                    $this->attrs['fields'] ?? []
-                );
+                return SuperStructure::align($rows, $this, $this->attrs['fields'] ?? []);
+            },
+            // siblings are only known after construction, so the sync state
+            // can't be a computed prop and is added when the Panel props are built
+            'toArray' => function () {
+                $array = [...$this->attrs, ...$this->props, ...$this->computed];
+
+                // lets the Panel hide row controls in secondary languages
+                $array['synced'] = SuperStructure::isSynced($this);
+
+                // lock synced fields outside the default language
+                if ($array['synced'] && App::instance()->language()->isDefault() === false) {
+                    foreach (SuperStructure::syncedNames($this->attrs['fields'] ?? []) as $name) {
+                        if (isset($array['fields'][$name]) === true) {
+                            $array['fields'][$name]['disabled'] = true;
+                        }
+                    }
+                }
+
+                return $array;
             },
             'props' => [
                 /**

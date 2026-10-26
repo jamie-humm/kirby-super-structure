@@ -8,8 +8,10 @@ its **nested fields** and gives every row a stable `_uuid`.
 >
 > **Not recommended for existing content.** Don't convert an existing
 > `structure` field that already holds content to `superstructure`. Existing rows
-> have no `_uuid`, so they can't be matched across languages, and syncing is
-> skipped until the default language is saved once. Use it for new fields.
+> have no `_uuid`, so they can't be matched across languages. Syncing is
+> skipped until the default language is saved once. After that, existing
+> secondary-language rows are **replaced** with copies of the default language
+> rows, so their translations are lost. Use it for new fields.
 
 ## Installation
 
@@ -42,14 +44,19 @@ fields:
 ## How it works
 
 - The default language is the single source of truth for which rows exist, their
-  order, and all `translate: false` fields.
+  order, and all `translate: false` fields. Rows are synced even when no nested
+  field is `translate: false`.
 - Secondary languages can't add, remove, duplicate or reorder rows. This is
   intentional. They only own the translatable fields of existing rows.
 - Synced fields are disabled in secondary languages in the Panel.
 - Rows are matched across languages by `_uuid`.
 - A row that is new to a language starts as a copy of the default language row; `translate: false` fields are always overwritten from the default.
 - Changes to the default language are pushed to existing translations
-  (`latest` and `changes` versions) via `*.update:after` hooks.
+  (`latest` and `changes` versions) via `*.update:after` hooks. If another user
+  is editing a translation, its `changes` version is skipped and is aligned
+  when it is saved or published.
+- Saving with an explicit language (`$page->update($data, 'en')`) aligns against
+  that language, not the language of the current request.
 
 ## Referencing entries by UUID
 
@@ -98,6 +105,11 @@ Note that the key is `_uuid`, with a leading underscore.
 
 - Existing rows without a `_uuid` are not synced until the default language is saved once.
 - Only top-level nested fields are supported (not fields inside nested structures).
+- The field itself must be a top-level blueprint field. A `superstructure` inside
+  blocks, layouts or another structure behaves like a core `structure` field
+  (no syncing, `translate: false` is ignored).
+- `sortBy` only sorts the Panel display. The stored order in all languages
+  always follows the default language.
 
 ## License
 
